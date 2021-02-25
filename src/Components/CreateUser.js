@@ -15,6 +15,7 @@ export class CreateUser extends Component {
         this.setState({
             users: res.data
         })
+        console.log(this.state);    
     }
     newUserChange = async (e) => {
         await this.setState({
@@ -24,13 +25,15 @@ export class CreateUser extends Component {
     newUserSubmit = async (e) => {
         e.preventDefault()
         this.setState({
+            users: [...this.state.users, 
+                {username: this.state.newUser}
+            ],
             newUser: '',
-            disableForm: true
+            disableForm: true,
         })
         await axios.post("https://mern-tutorial-server.gati.repl.co/api/users", {
             username: this.state.newUser
         })
-        await this.leerDB()
         this.setState({
             disableForm: false
         })
