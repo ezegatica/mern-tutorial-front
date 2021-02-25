@@ -11,7 +11,7 @@ export class CreateUser extends Component {
         this.leerDB()
     }
     leerDB = async () => {
-        const res = await axios.get("https://mern-tutorial-server.gati.repl.co/api/users")
+        const res = await axios.get("https://api.mern-tutorial.eze.wtf/api/users")
         this.setState({
             users: res.data
         })
@@ -31,7 +31,7 @@ export class CreateUser extends Component {
             newUser: '',
             disableForm: true,
         })
-        await axios.post("https://mern-tutorial-server.gati.repl.co/api/users", {
+        await axios.post("https://api.mern-tutorial.eze.wtf/api/users", {
             username: this.state.newUser
         })
         this.setState({
@@ -40,7 +40,7 @@ export class CreateUser extends Component {
     }
     userDelete = async (id) => {
         console.log('ID: ', id);
-        await axios.delete("https://mern-tutorial-server.gati.repl.co/api/users/" + id)
+        await axios.delete("https://api.mern-tutorial.eze.wtf/api/users/" + id)
         this.leerDB()
     }
     render() {

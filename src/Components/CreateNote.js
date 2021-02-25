@@ -32,7 +32,7 @@ export class CreateNote extends Component {
         console.log(this.state)
     }
     leerUsuarios = async () => {
-        const res = await axios.get('https://mern-tutorial-server.gati.repl.co/api/users')
+        const res = await axios.get('https://api.mern-tutorial.eze.wtf/api/users')
         this.setState({
             users: res.data,
             userSelected: res.data[0].username
