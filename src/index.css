@@ -10,7 +10,9 @@ background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-2
 background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 }
-
+.lista-notas{
+  color: white;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

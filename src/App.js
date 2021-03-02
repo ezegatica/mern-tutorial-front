@@ -17,7 +17,6 @@ function App() {
       <Navigation /> 
       <Container className="p-4">
         <Switch>
-
           <Route exact path="/" component={Home} />
           <Route path="/editar/:id" component={CreateNote} />
           <Route path="/crear" component={CreateNote} />

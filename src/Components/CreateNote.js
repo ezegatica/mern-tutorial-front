@@ -9,27 +9,34 @@ export class CreateNote extends Component {
         users: [],
         userSelected: '',
         title: '',
-        body: '',
+        content: '',
         date: new Date()
     }
     componentDidMount = () => {
         this.leerUsuarios()
     }
-    submitNuevaNota = (e) => {
+    submitNuevaNota = async (e) => {
+        console.log('subiedno!');
+        console.log("state", this.state);
         e.preventDefault();
+        const newNote = {
+            title: this.state.title,
+            content: this.state.content,
+            author: this.state.userSelected
+        }
+        await axios.post("https://api.mern-tutorial.eze.wtf/api/notes", newNote)
+        window.location.href = '/'
 
     }
     change = async (e) => {
         await this.setState({
             [e.target.name]: e.target.value
         })
-        console.log(this.state)
     }
     changeDate = async (date) => {
         await this.setState({
             date
         })
-        console.log(this.state)
     }
     leerUsuarios = async () => {
         const res = await axios.get('https://api.mern-tutorial.eze.wtf/api/users')
@@ -44,6 +51,7 @@ export class CreateNote extends Component {
                 <div className="card card-body">
                     <h4>Crear una Nota</h4>
                     {/* SELECT USER */}
+                    <form onSubmit={this.submitNuevaNota}>
                     <div className="form-group">
                         <select className='form-control' name='userSelected' onChange={this.change}>
                             {
@@ -70,8 +78,8 @@ export class CreateNote extends Component {
                         <DatePicker className='form-control' id='date' name='date' selected={this.state.date} onChange={this.changeDate} />
                     </div>
 
-                    <form onSubmit={this.submitNuevaNota}>
-                        <Button type="submit" className="mb-2" disabled={this.state.disableForm}>
+                    
+                        <Button type="submit" className="mb-2" disabled={this.state.disableForm} onClick={this.submitNuevaNota}>
                             Guardar
                         </Button>
                     </form>
