@@ -1,92 +1,132 @@
 import React, { Component } from 'react'
-import axios from 'axios'
-import { Button } from 'react-bootstrap'
-import DatePicker from 'react-datepicker'
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'
-export class CreateNote extends Component {
+import axios from 'axios'
+
+export default class CreateNote extends Component {
+
     state = {
-        disableForm: false,
-        users: [],
-        userSelected: '',
         title: '',
         content: '',
-        date: new Date()
+        date: new Date(),
+        userSelected: '',
+        users: [],
+        editing: false,
+        _id: ''
     }
-    componentDidMount = () => {
-        this.leerUsuarios()
-    }
-    submitNuevaNota = async (e) => {
-        console.log('subiedno!');
-        console.log("state", this.state);
-        e.preventDefault();
-        const newNote = {
-            title: this.state.title,
-            content: this.state.content,
-            author: this.state.userSelected
+
+    async componentDidMount() {
+        const res = await axios.get('https://api.mern-tutorial.eze.wtf/api/users');
+        if (res.data.length > 0) {
+            this.setState({
+                users: res.data.map(user => user.username),
+                userSelected: res.data[0].username
+            })
         }
-        await axios.post("https://api.mern-tutorial.eze.wtf/api/notes", newNote)
-        window.location.href = '/'
+        if (this.props.match.params.id) {
+            console.log(this.props.match.params.id)
+            const res = await axios.get('https://api.mern-tutorial.eze.wtf/api/notes/' + this.props.match.params.id);
+            console.log(res.data)
+            this.setState({
+                title: res.data.title,
+                content: res.data.content,
+                date: new Date(res.data.date),
+                userSelected: res.data.author,
+                _id: res.data._id,
+                editing: true
+            });
+        }
+    }
+
+    onSubmit = async (e) => {
+        e.preventDefault();
+        if (this.state.editing) {
+            const updatedNote = {
+                title: this.state.title,
+                content: this.state.content,
+                author: this.state.userSelected,
+                date: this.state.date
+            };
+            await axios.put('https://api.mern-tutorial.eze.wtf/api/notes/' + this.state._id, updatedNote);
+        } else {
+            const newNote = {
+                title: this.state.title,
+                content: this.state.content,
+                author: this.state.userSelected,
+                date: this.state.date
+            };
+            await axios.post('https://api.mern-tutorial.eze.wtf/api/notes', newNote);
+        }
+        window.location.href = '/';
 
     }
-    change = async (e) => {
-        await this.setState({
+
+    onInputChange = (e) => {
+        this.setState({
             [e.target.name]: e.target.value
         })
     }
-    changeDate = async (date) => {
-        await this.setState({
-            date
-        })
+
+    onChangeDate = date => {
+        this.setState({ date });
     }
-    leerUsuarios = async () => {
-        const res = await axios.get('https://api.mern-tutorial.eze.wtf/api/users')
-        this.setState({
-            users: res.data,
-            userSelected: res.data[0].username
-        })
-    }
+
     render() {
         return (
             <div className="col-md-6 offset-md-3">
                 <div className="card card-body">
-                    <h4>Crear una Nota</h4>
-                    {/* SELECT USER */}
-                    <form onSubmit={this.submitNuevaNota}>
-                    <div className="form-group">
-                        <select className='form-control' name='userSelected' onChange={this.change}>
-                            {
-                                this.state.users.map((user) => {
-                                    return (
-                                        <option value={user.username} key={user._id} id='userSelected'>
-                                            {user.username}
+                    <h4>Create a Note</h4>
+                    <form onSubmit={this.onSubmit}>
+                        {/* SELECT THE USER */}
+                        <div className="form-group">
+                            <select
+                                className="form-control"
+                                value={this.state.userSelected}
+                                onChange={this.onInputChange}
+                                name="userSelected"
+                                required>
+                                {
+                                    this.state.users.map(user => (
+                                        <option key={user} value={user}>
+                                            {user}
                                         </option>
-                                    )
-                                })
-                            }
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <input type="text" className='form-control' placeholder='Titulo' name='title' id='title' required onChange={this.change} />
-                    </div>
-
-                    <div className="form-group">
-                        <textarea className='form-control' id='content' name='content' placeholder='Contenido' required onChange={this.change}></textarea>
-                    </div>
-
-                    <div className="form-group">
-                        <DatePicker className='form-control' id='date' name='date' selected={this.state.date} onChange={this.changeDate} />
-                    </div>
-
-                    
-                        <Button type="submit" className="mb-2" disabled={this.state.disableForm} onClick={this.submitNuevaNota}>
-                            Guardar
-                        </Button>
+                                    ))
+                                }
+                            </select>
+                        </div>
+                        {/* Note Title */}
+                        <div className="form-group">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Title"
+                                onChange={this.onInputChange}
+                                name="title"
+                                value={this.state.title}
+                                required />
+                        </div>
+                        {/* Note Content */}
+                        <div className="form-group">
+                            <textarea
+                                type="text"
+                                className="form-control"
+                                placeholder="Content"
+                                name="content"
+                                onChange={this.onInputChange}
+                                value={this.state.content}
+                                required>
+                            </textarea>
+                        </div>
+                        {/* Note Date */}
+                        <div className="form-group">
+                            <DatePicker className="form-control" selected={this.state.date} onChange={this.onChangeDate} />
+                        </div>
+                        <button className="btn btn-primary">
+                            Guardar!
+                        </button>
                     </form>
                 </div>
             </div>
         )
     }
 }
-
-export default CreateNote
